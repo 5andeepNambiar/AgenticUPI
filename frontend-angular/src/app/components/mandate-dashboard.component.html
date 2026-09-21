@@ -1,0 +1,64 @@
+<div class="mandate-dashboard" *ngIf="vm$ | async as vm">
+
+  <header>
+    <h2>Active AI Agents</h2>
+  </header>
+
+  <!-- Error Banner -->
+  <div class="error-banner" *ngIf="vm.error" style="color: red; border: 1px solid red; padding: 1rem;">
+    <p>{{ vm.error }}</p>
+  </div>
+
+  <!-- Loading State -->
+  <div class="skeleton-loader" *ngIf="vm.isLoading">
+    <p>Loading your secured mandates...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!vm.isLoading && vm.mandates.length === 0">
+    <p>No active AI agents connected to your account.</p>
+  </div>
+
+  <!-- Data Grid -->
+  <div class="mandate-grid" *ngIf="vm.mandates.length > 0">
+    <div class="mandate-card" *ngFor="let mandate of vm.mandates" style="border: 1px solid #ccc; margin: 1rem 0; padding: 1rem;">
+
+      <div class="card-header">
+        <h3>{{ mandate.agentName }}</h3>
+        <span class="status-badge">
+          Status: {{ mandate.status }}
+        </span>
+      </div>
+
+      <div class="card-body">
+        <div class="metric">
+          <label>Daily Limit: </label>
+          <!-- Using Angular currency pipe to convert paise to INR safely -->
+          <span>{{ (mandate.dailyLimitPaise / 100) | currency:'INR' }}</span>
+        </div>
+        <div class="metric">
+          <label>Used Today: </label>
+          <span>{{ (mandate.consumedTodayPaise / 100) | currency:'INR' }}</span>
+        </div>
+      </div>
+
+      <div class="card-actions" style="margin-top: 1rem;">
+        <!--
+          Disable button if:
+          1. Mandate is already revoked/expired
+          2. THIS specific mandate is currently being revoked (in-flight network call)
+        -->
+        <button
+          class="btn-danger"
+          [disabled]="mandate.status !== 'ACTIVE' || vm.isRevokingUmn === mandate.umn"
+          (click)="onRevoke(mandate.umn)">
+
+          <span *ngIf="vm.isRevokingUmn === mandate.umn">Revoking internally...</span>
+          <span *ngIf="vm.isRevokingUmn !== mandate.umn">🚨 Revoke Access</span>
+
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

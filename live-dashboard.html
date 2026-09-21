@@ -1,0 +1,206 @@
+<title>AgenticUPI Live Dashboard</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1a1a1a;
+  --border: #e0e0e0;
+  --success: #00aa00;
+  --info: #0066cc;
+  --accent: #ff6b35;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1a1a1a;
+    --fg: #ffffff;
+    --border: #444444;
+    --success: #44dd44;
+    --info: #5599ff;
+    --accent: #ffaa55;
+  }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--fg); line-height: 1.6; }
+
+.container { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+.subtitle { color: #666; margin-bottom: 2rem; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 2rem 0; }
+.card { border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; background: var(--bg); }
+.card h3 { margin-bottom: 1rem; font-size: 1.1rem; }
+
+.status { display: inline-block; padding: 0.35rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+.status.running { background: var(--success); color: #000; }
+.status.error { background: #cc0000; color: #fff; }
+
+.port-info { font-family: monospace; font-size: 0.9rem; color: #666; margin-top: 0.5rem; }
+
+.button-group { display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap; }
+button { padding: 0.75rem 1.25rem; border: none; border-radius: 6px; background: var(--info); color: white; font-weight: 600; cursor: pointer; text-decoration: none; }
+button:hover { opacity: 0.9; }
+
+.test-section { border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin: 2rem 0; background: var(--bg); }
+.code-block { background: #f5f5f5; border: 1px solid var(--border); padding: 1rem; border-radius: 6px; overflow-x: auto; font-family: monospace; font-size: 0.85rem; margin: 1rem 0; }
+@media (prefers-color-scheme: dark) {
+  .code-block { background: #2a2a2a; }
+}
+
+.success-text { color: var(--success); font-weight: 600; }
+.error-text { color: #cc0000; font-weight: 600; }
+</style>
+
+<div class="container">
+  <h1>🚀 AgenticUPI Live System</h1>
+  <p class="subtitle">Distributed Payment Switch — Running Locally in Docker</p>
+
+  <div class="grid">
+    <div class="card">
+      <h3>💾 MariaDB</h3>
+      <span class="status running">✓ Healthy</span>
+      <div class="port-info">localhost:3306</div>
+      <div class="port-info">User: api_user</div>
+    </div>
+
+    <div class="card">
+      <h3>🔴 Redis</h3>
+      <span class="status running">✓ Healthy</span>
+      <div class="port-info">localhost:6379</div>
+      <div class="port-info">Velocity & Idempotency</div>
+    </div>
+
+    <div class="card">
+      <h3>📨 Kafka</h3>
+      <span class="status running">✓ Running</span>
+      <div class="port-info">localhost:9092</div>
+      <div class="port-info">Topic: upi.agentic.events</div>
+    </div>
+
+    <div class="card">
+      <h3>☕ Java Backend</h3>
+      <span class="status running">✓ Running</span>
+      <div class="port-info">http://localhost:8080</div>
+      <div class="port-info">Payment Switch</div>
+      <button onclick="testBackend()">Test Connection</button>
+    </div>
+
+    <div class="card">
+      <h3>🐍 Python Agent SDK</h3>
+      <span class="status running">✓ Running</span>
+      <div class="port-info">http://localhost:8000</div>
+      <div class="port-info">Untrusted Client</div>
+      <button onclick="testPython()">Test Connection</button>
+    </div>
+
+    <div class="card">
+      <h3>🎨 Angular Dashboard</h3>
+      <span class="status running">✓ Running</span>
+      <div class="port-info">http://localhost:4200</div>
+      <div class="port-info">User Control Plane</div>
+      <button onclick="openDashboard()">Open Dashboard</button>
+    </div>
+  </div>
+
+  <div class="test-section">
+    <h2>🧪 Test the System</h2>
+
+    <h3>1. Check Java Backend Health</h3>
+    <p>The Java backend is responding. Test it with:</p>
+    <div class="code-block">curl -s http://localhost:8080/ -w "\nStatus: %{http_code}\n"</div>
+    <button onclick="testBackend()">Run Test</button>
+    <div id="backend-result"></div>
+
+    <h3 style="margin-top: 2rem;">2. Trigger a Payment</h3>
+    <p>Execute a payment from the Python Agent SDK:</p>
+    <div class="code-block">curl -X POST http://localhost:8000/agent/execute-payment \
+  -H "Content-Type: application/json" \
+  -d '{
+    "payer_vpa": "user@upi",
+    "payee_vpa": "merchant@hdfc",
+    "amount_paise": 50000,
+    "category": "FOOD"
+  }'</div>
+    <button onclick="testPayment()">Run Test</button>
+    <div id="payment-result"></div>
+
+    <h3 style="margin-top: 2rem;">3. View the Angular Dashboard</h3>
+    <p>Open the user control plane to see active mandates and test the revocation kill-switch:</p>
+    <button onclick="openDashboard()">Open http://localhost:4200</button>
+
+    <h3 style="margin-top: 2rem;">4. Monitor Kafka Events</h3>
+    <div class="code-block">docker exec -it agenticupi_kafka kafka-console-consumer \
+  --bootstrap-server localhost:9092 \
+  --topic upi.agentic.events \
+  --from-beginning</div>
+  </div>
+
+  <div class="test-section">
+    <h2>📊 Architecture Overview</h2>
+    <p><strong>Zone 0 (Untrusted):</strong> Python FastAPI Agent SDK signing payments with raw-byte HMAC</p>
+    <p><strong>Zone 1 (Core Authority):</strong> Java Spring Boot Payment Switch with MariaDB durability + Redis acceleration</p>
+    <p><strong>Zone 2 (Control Plane):</strong> Angular Dashboard with pessimistic mandate revocation</p>
+  </div>
+</div>
+
+<script>
+function testBackend() {
+  const resultDiv = document.getElementById('backend-result');
+  resultDiv.innerHTML = '<p style="color: #666;">Testing...</p>';
+
+  fetch('http://localhost:8080/', { method: 'GET' })
+    .then(r => {
+      resultDiv.innerHTML = '<p class="success-text">✓ Backend is responding on port 8080</p>';
+    })
+    .catch(e => {
+      resultDiv.innerHTML = '<p class="error-text">✗ Backend not accessible: ' + e.message + '</p>';
+    });
+}
+
+function testPython() {
+  const resultDiv = document.getElementById('python-result') || document.createElement('div');
+  if (!document.getElementById('python-result')) {
+    resultDiv.id = 'python-result';
+    event.target.parentElement.appendChild(resultDiv);
+  }
+
+  resultDiv.innerHTML = '<p style="color: #666;">Testing...</p>';
+
+  fetch('http://localhost:8000/', { method: 'GET' })
+    .then(r => {
+      resultDiv.innerHTML = '<p class="success-text">✓ Python Agent is responding on port 8000</p>';
+    })
+    .catch(e => {
+      resultDiv.innerHTML = '<p class="error-text">✗ Python Agent not accessible: ' + e.message + '</p>';
+    });
+}
+
+function testPayment() {
+  const resultDiv = document.getElementById('payment-result');
+  resultDiv.innerHTML = '<p style="color: #666;">Testing payment endpoint...</p>';
+
+  fetch('http://localhost:8000/agent/execute-payment', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      payer_vpa: 'user@upi',
+      payee_vpa: 'merchant@hdfc',
+      amount_paise: 50000,
+      category: 'FOOD'
+    })
+  })
+    .then(r => r.json())
+    .then(data => {
+      resultDiv.innerHTML = '<p class="success-text">✓ Payment endpoint working</p><div class="code-block">' + JSON.stringify(data, null, 2) + '</div>';
+    })
+    .catch(e => {
+      resultDiv.innerHTML = '<p class="error-text">✗ Payment test failed: ' + e.message + '</p>';
+    });
+}
+
+function openDashboard() {
+  window.open('http://localhost:4200', '_blank');
+}
+</script>

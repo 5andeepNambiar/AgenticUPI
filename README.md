@@ -35,11 +35,3 @@ A production-grade, distributed systems architecture demonstrating secure, low-l
    npm install
    npm start
    ```
-
-## Key Mechanisms & "Interview Signals"
-- **Double IDEMPOTENCY check**: Fast check via Redis `setIfAbsent` (TTL 48h), backed by hard MariaDB `UNIQUE(idempotency_key, agent_id)` index.
-- **Constant-Time Verification**: `MessageDigest.isEqual` protects against timing attacks during HMAC signature check. Secrets zeroized in memory immediately.
-- **ACID Ledger**: Double-entry accounting ensures balance sum is always zero.
-- **Relay Worker**: Polling events safely using `SELECT ... FOR UPDATE SKIP LOCKED` without blocking inserts.
-
-*No mocks. No placeholders. Real implementations.*

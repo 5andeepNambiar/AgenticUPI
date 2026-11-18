@@ -1,20 +1,19 @@
 version: '3.8'
 
 services:
-  mariadb:
-    image: mariadb:10.11
+  postgres:
+    image: pgvector/pgvector:pg16
     container_name: agenticupi_db
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: agenticupi
-      MYSQL_USER: api_user
-      MYSQL_PASSWORD: api_password
+      POSTGRES_DB: agenticupi
+      POSTGRES_USER: api_user
+      POSTGRES_PASSWORD: api_password
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - ./infrastructure/mariadb-init:/docker-entrypoint-initdb.d
+      - ./infrastructure/postgres-init:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD-SHELL", "pg_isready -U api_user -d agenticupi"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -61,7 +60,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      mariadb:
+      postgres:
         condition: service_healthy
       redis:
         condition: service_healthy

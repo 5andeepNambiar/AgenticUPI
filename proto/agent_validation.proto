@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package com.agenticupi.grpc;
+
+option java_multiple_files = true;
+option java_package = "com.agenticupi.grpc";
+option java_outer_classname = "AgentValidationProto";
+
+// Service contract between Spring Boot (Caller) and Python Agent (Server)
+service AgentValidationService {
+  // Synchronous RPC for low-latency pre-transaction validation
+  rpc ValidatePaymentIntent (ValidationRequest) returns (ValidationResponse);
+
+  // Server streaming RPC for real-time anomaly telemetry
+  rpc StreamRiskTelemetry (TelemetryRequest) returns (stream RiskScoreUpdate);
+}
+
+message ValidationRequest {
+  string agent_id = 1;
+  string payer_vpa = 2;
+  string payee_vpa = 3;
+  int64 amount_paise = 4;
+  string purpose_description = 5;
+  string idempotency_key = 6;
+}
+
+message ValidationResponse {
+  bool is_allowed = 1;
+  string reason = 2;
+  double risk_score = 3;       // 0.0 (safe) to 1.0 (fraudulent)
+  string suggested_action = 4; // "APPROVE", "STEP_UP_AUTH", "REJECT"
+  int64 evaluation_latency_ms = 5;
+}
+
+message TelemetryRequest {
+  string agent_id = 1;
+}
+
+message RiskScoreUpdate {
+  string agent_id = 1;
+  double live_anomaly_score = 2;
+  string timestamp = 3;
+}

@@ -6,7 +6,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface OutboxEventRepository extends JpaRepository<OutboxEvent, Long> {
-    // MariaDB SKIP LOCKED implementation to pull events securely and rapidly
-    @Query(value = "SELECT * FROM outbox_events WHERE status = 'PENDING' LIMIT :limit FOR UPDATE SKIP LOCKED", nativeQuery = true)
+    // PostgreSQL FOR UPDATE SKIP LOCKED implementation to pull events securely without lock contention
+    @Query(value = "SELECT * FROM outbox_events WHERE status = 'PENDING' FOR UPDATE SKIP LOCKED LIMIT :limit", nativeQuery = true)
     List<OutboxEvent> findPendingEventsForUpdate(@Param("limit") int limit);
 }

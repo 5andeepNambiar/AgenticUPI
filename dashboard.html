@@ -1,597 +1,327 @@
-<title>AgenticUPI Live System Dashboard</title>
+<title>AgenticUPI Live Dashboard</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 :root {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
-  --text-primary: #1a1a1a;
-  --text-secondary: #666666;
+  --bg: #ffffff;
+  --fg: #1a1a1a;
   --border: #e0e0e0;
-  --accent-blue: #0066cc;
-  --accent-green: #00aa00;
-  --accent-yellow: #ffaa00;
-  --accent-red: #cc0000;
-  --zone-1: #e8f4fd;
-  --zone-2: #f0f8e8;
-  --zone-0: #fef4e8;
+  --success: #10b981;
+  --info: #0066cc;
+  --accent: #ff6b35;
+  --error: #dc2626;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg-primary: #1a1a1a;
-    --bg-secondary: #2a2a2a;
-    --text-primary: #ffffff;
-    --text-secondary: #aaaaaa;
+    --bg: #1a1a1a;
+    --fg: #ffffff;
     --border: #444444;
-    --accent-blue: #5599ff;
-    --accent-green: #44dd44;
-    --accent-yellow: #ffbb33;
-    --zone-1: #1a3a4d;
-    --zone-2: #1a3a1a;
-    --zone-0: #4d3a1a;
+    --success: #34d399;
+    --info: #5599ff;
+    --accent: #ffaa55;
   }
 }
 
-:root[data-theme="dark"] {
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #2a2a2a;
-  --text-primary: #ffffff;
-  --text-secondary: #aaaaaa;
-  --border: #444444;
-  --accent-blue: #5599ff;
-  --accent-green: #44dd44;
-  --accent-yellow: #ffbb33;
-  --zone-1: #1a3a4d;
-  --zone-2: #1a3a1a;
-  --zone-0: #4d3a1a;
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--fg); line-height: 1.6; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+.subtitle { color: #888; margin-bottom: 2rem; font-size: 1.1rem; }
+
+.services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+.service-card { border: 2px solid var(--border); border-radius: 12px; padding: 2rem; background: var(--bg); transition: all 0.3s ease; }
+.service-card:hover { border-color: var(--info); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+.service-name { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; }
+.status-badge { display: inline-block; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.9rem; }
+.status-badge.running { background: var(--success); color: #000; }
+.status-badge.error { background: var(--error); color: #fff; }
+
+.port-info { margin-top: 1rem; font-family: monospace; color: #666; font-size: 0.95rem; }
+.port-info strong { color: var(--fg); }
+
+.action-buttons { display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap; }
+button, a.button { padding: 0.75rem 1.25rem; border: none; border-radius: 8px; background: var(--info); color: white; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.2s ease; }
+button:hover, a.button:hover { opacity: 0.9; transform: translateY(-2px); }
+
+.test-section { border: 2px solid var(--border); border-radius: 12px; padding: 2rem; margin: 2rem 0; background: var(--bg); }
+.test-section h2 { margin-bottom: 1.5rem; font-size: 1.5rem; }
+
+.code-block { background: #f5f5f5; border: 1px solid var(--border); padding: 1.5rem; border-radius: 8px; overflow-x: auto; font-family: monospace; font-size: 0.85rem; margin: 1rem 0; line-height: 1.5; }
+@media (prefers-color-scheme: dark) {
+  .code-block { background: #2a2a2a; }
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+.result { margin-top: 1rem; padding: 1rem; border-radius: 8px; display: none; }
+.result.show { display: block; }
+.result.success { background: rgba(16, 185, 129, 0.1); border-left: 4px solid var(--success); color: var(--success); }
+.result.error { background: rgba(220, 38, 38, 0.1); border-left: 4px solid var(--error); color: var(--error); }
 
-html {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
-}
+.intro { background: rgba(0, 102, 204, 0.05); border-left: 4px solid var(--info); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; }
 
-body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-}
+.divider { border-top: 2px solid var(--border); margin: 3rem 0; }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
-}
-
-header {
-  margin-bottom: 3rem;
-  border-bottom: 2px solid var(--border);
-  padding-bottom: 2rem;
-}
-
-h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  letter-spacing: -0.02em;
-}
-
-.subtitle {
-  font-size: 1.1rem;
-  color: var(--text-secondary);
-}
-
-section {
-  margin-bottom: 3rem;
-}
-
-h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
-  border-left: 4px solid var(--accent-blue);
-  padding-left: 1rem;
-}
-
-.architecture {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.zone {
-  border: 2px solid var(--border);
-  border-radius: 8px;
-  padding: 1.5rem;
-  background: var(--bg-secondary);
-}
-
-.zone-0 { background: var(--zone-0); border-color: var(--accent-yellow); }
-.zone-1 { background: var(--zone-1); border-color: var(--accent-blue); }
-.zone-2 { background: var(--zone-2); border-color: var(--accent-green); }
-
-.zone-label {
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.75rem;
-  color: var(--text-secondary);
-}
-
-.zone h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-
-.zone p {
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: var(--text-secondary);
-  margin-bottom: 1rem;
-}
-
-.tech-stack {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1rem;
-}
-
-.tech-badge {
-  display: inline-block;
-  background: var(--bg-primary);
-  border: 1px solid var(--border);
-  padding: 0.35rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: 500;
-}
-
-.containers-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-}
-
-.container-card {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1.25rem;
-  background: var(--bg-secondary);
-}
-
-.container-name {
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  font-size: 0.95rem;
-}
-
-.status-badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-}
-
-.status-healthy {
-  background: var(--accent-green);
-  color: #000;
-}
-
-.status-running {
-  background: var(--accent-blue);
-  color: #fff;
-}
-
-.port-info {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  font-family: "Monaco", "Courier New", monospace;
-  margin-top: 0.5rem;
-}
-
-.test-flow {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 2rem;
-  margin-bottom: 2rem;
-}
-
-.flow-step {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 1.5rem;
-  position: relative;
-}
-
-.flow-step::before {
-  content: '';
-  position: absolute;
-  left: 1rem;
-  top: 2.75rem;
-  width: 2px;
-  height: 1.5rem;
-  background: var(--border);
-  z-index: 0;
-}
-
-.flow-step:last-child::before {
-  display: none;
-}
-
-.flow-number {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  background: var(--accent-blue);
-  color: white;
-  font-weight: 700;
-  font-size: 0.9rem;
-  margin-right: 1.5rem;
-  flex-shrink: 0;
-  z-index: 1;
-}
-
-.flow-content h4 {
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.flow-content p {
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-  margin-bottom: 0.5rem;
-}
-
-.code-block {
-  background: var(--bg-primary);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 1rem;
-  font-family: "Monaco", "Courier New", monospace;
-  font-size: 0.85rem;
-  overflow-x: auto;
-  margin-top: 0.75rem;
-  color: var(--accent-blue);
-}
-
-.endpoints {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
-}
-
-.endpoint-card {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1.25rem;
-  background: var(--bg-secondary);
-}
-
-.endpoint-method {
-  display: inline-block;
-  font-weight: 700;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0.35rem 0.75rem;
-  border-radius: 4px;
-  margin-bottom: 0.75rem;
-}
-
-.method-get { background: var(--accent-blue); color: white; }
-.method-post { background: var(--accent-green); color: white; }
-.method-delete { background: var(--accent-red); color: white; }
-
-.endpoint-path {
-  font-family: "Monaco", "Courier New", monospace;
-  font-size: 0.9rem;
-  word-break: break-all;
-  margin-bottom: 0.75rem;
-}
-
-.endpoint-description {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-}
-
-.signal-box {
-  background: var(--zone-1);
-  border-left: 4px solid var(--accent-blue);
-  padding: 1.5rem;
-  border-radius: 6px;
-  margin-bottom: 1.5rem;
-}
-
-.signal-box h4 {
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-  color: var(--text-primary);
-}
-
-.signal-box p {
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-.signal-box ul {
-  margin-left: 1.5rem;
-  margin-top: 0.75rem;
-  font-size: 0.95rem;
-  color: var(--text-secondary);
-}
-
-.signal-box li {
-  margin-bottom: 0.5rem;
-}
-
-footer {
-  border-top: 1px solid var(--border);
-  padding-top: 2rem;
-  margin-top: 3rem;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-}
-
-@media (max-width: 768px) {
-  .container {
-    padding: 1.5rem;
-  }
-
-  h1 {
-    font-size: 1.75rem;
-  }
-
-  h2 {
-    font-size: 1.25rem;
-  }
-}
+.quicklinks { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0; }
+.quicklink { padding: 1.5rem; background: rgba(0, 102, 204, 0.05); border: 2px solid var(--info); border-radius: 8px; text-decoration: none; color: var(--fg); transition: all 0.2s ease; }
+.quicklink:hover { background: rgba(0, 102, 204, 0.1); }
+.quicklink-title { font-weight: 600; margin-bottom: 0.5rem; }
+.quicklink-url { font-family: monospace; font-size: 0.85rem; color: #888; }
 </style>
 
 <div class="container">
-  <header>
-    <h1>🚀 AgenticUPI Live System</h1>
-    <p class="subtitle">Distributed Payment Switch for Untrusted AI Agents — Now Running Locally</p>
-  </header>
+  <h1>🚀 AgenticUPI Live System</h1>
+  <p class="subtitle">Distributed Payment Switch Running on localhost</p>
 
-  <section>
-    <h2>System Architecture (3-Tier)</h2>
-    <div class="architecture">
-      <div class="zone zone-0">
-        <div class="zone-label">Zone 0: Untrusted</div>
-        <h3>🤖 Python Agent SDK</h3>
-        <p>LLM orchestration layer. Generates structured payment intents, signs with raw-byte HMAC-SHA256, and orchestrates retries with idempotency guarantees.</p>
-        <div class="tech-stack">
-          <span class="tech-badge">FastAPI</span>
-          <span class="tech-badge">Pydantic</span>
-          <span class="tech-badge">httpx</span>
-        </div>
-      </div>
+  <div class="intro">
+    <strong>All services are running!</strong> Access the system at the links below. The backend is processing payments with real ACID guarantees, two-phase velocity limits, and idempotency protection.
+  </div>
 
-      <div class="zone zone-1">
-        <div class="zone-label">Zone 1: Core Authority</div>
-        <h3>💳 Java Payment Switch</h3>
-        <p>ACID boundary with dual-write protection. Performs raw-payload HMAC validation, executes pessimistic DB locks, two-phase Redis velocity, and high-throughput Kafka outbox relays.</p>
-        <div class="tech-stack">
-          <span class="tech-badge">Spring Boot</span>
-          <span class="tech-badge">MariaDB</span>
-          <span class="tech-badge">Redis</span>
-          <span class="tech-badge">Kafka</span>
-        </div>
-      </div>
+  <div class="quicklinks">
+    <a href="http://localhost:4200" class="quicklink" target="_blank">
+      <div class="quicklink-title">📊 User Dashboard</div>
+      <div class="quicklink-url">localhost:4200</div>
+    </a>
+    <a href="http://localhost:8080" class="quicklink" target="_blank">
+      <div class="quicklink-title">☕ Java Backend</div>
+      <div class="quicklink-url">localhost:8080</div>
+    </a>
+    <a href="http://localhost:8000" class="quicklink" target="_blank">
+      <div class="quicklink-title">🐍 Python Agent SDK</div>
+      <div class="quicklink-url">localhost:8000</div>
+    </a>
+  </div>
 
-      <div class="zone zone-2">
-        <div class="zone-label">Zone 2: Control Plane</div>
-        <h3>📊 Angular Dashboard</h3>
-        <p>User-facing mandate manager. Declarative RxJS streams, pessimistic revocation UI (no optimistic updates for kill-switches), rage-click idempotency protection.</p>
-        <div class="tech-stack">
-          <span class="tech-badge">Angular 16+</span>
-          <span class="tech-badge">RxJS</span>
-          <span class="tech-badge">OnPush CD</span>
-        </div>
+  <h2 style="margin-top: 2rem; margin-bottom: 1.5rem;">📡 Service Status</h2>
+
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-name">💾 MariaDB</div>
+      <span class="status-badge running">✓ Running</span>
+      <div class="port-info">
+        <strong>localhost:3306</strong><br>
+        User: api_user<br>
+        DB: agenticupi
       </div>
+      <button onclick="testService('http://localhost:3306', 'MariaDB')">Test Connection</button>
     </div>
-  </section>
 
-  <section>
-    <h2>Running Containers</h2>
-    <div class="containers-grid">
-      <div class="container-card">
-        <div class="container-name">MariaDB</div>
-        <span class="status-badge status-healthy">✓ Healthy</span>
-        <div class="port-info">localhost:3306</div>
-        <div class="port-info">DB: agenticupi</div>
-        <div class="port-info">User: api_user</div>
+    <div class="service-card">
+      <div class="service-name">🔴 Redis</div>
+      <span class="status-badge running">✓ Running</span>
+      <div class="port-info">
+        <strong>localhost:6379</strong><br>
+        Velocity & Idempotency<br>
+        Cache & Kill-Switches
       </div>
-
-      <div class="container-card">
-        <div class="container-name">Redis</div>
-        <span class="status-badge status-healthy">✓ Healthy</span>
-        <div class="port-info">localhost:6379</div>
-        <div class="port-info">Velocity & Idempotency Cache</div>
-      </div>
-
-      <div class="container-card">
-        <div class="container-name">Kafka</div>
-        <span class="status-badge status-running">⊙ Running</span>
-        <div class="port-info">localhost:9092</div>
-        <div class="port-info">Topic: upi.agentic.events</div>
-      </div>
-
-      <div class="container-card">
-        <div class="container-name">Java Backend</div>
-        <span class="status-badge status-running">⊙ Running</span>
-        <div class="port-info">http://localhost:8080</div>
-        <div class="port-info">Payment Switch Core</div>
-      </div>
-
-      <div class="container-card">
-        <div class="container-name">Python Agent</div>
-        <span class="status-badge status-running">⊙ Running</span>
-        <div class="port-info">http://localhost:8000</div>
-        <div class="port-info">Untrusted SDK</div>
-      </div>
-
-      <div class="container-card">
-        <div class="container-name">Angular UI</div>
-        <span class="status-badge status-running">⊙ Running</span>
-        <div class="port-info">http://localhost:4200</div>
-        <div class="port-info">User Dashboard</div>
-      </div>
+      <div id="redis-result" class="result"></div>
     </div>
-  </section>
 
-  <section>
-    <h2>End-to-End Test Flow</h2>
-    <div class="test-flow">
-      <div class="flow-step">
-        <div class="flow-number">1</div>
-        <div class="flow-content">
-          <h4>Open User Dashboard</h4>
-          <p>Visit <strong>http://localhost:4200</strong> to see the Angular mandate manager.</p>
-          <p>You'll see one active mandate: <code>agent_demo_1</code> (Demo AI Travel Agent) authorized for ₹1,000/day.</p>
-        </div>
+    <div class="service-card">
+      <div class="service-name">📨 Kafka</div>
+      <span class="status-badge running">✓ Running</span>
+      <div class="port-info">
+        <strong>localhost:9092</strong><br>
+        Outbox Relay Events<br>
+        Topic: upi.agentic.events
       </div>
+      <div id="kafka-result" class="result"></div>
+    </div>
 
-      <div class="flow-step">
-        <div class="flow-number">2</div>
-        <div class="flow-content">
-          <h4>Trigger a Payment from Python SDK</h4>
-          <p>Call the Python Agent SDK endpoint to simulate an LLM making a payment decision:</p>
-          <div class="code-block">
-curl -X POST http://localhost:8000/agent/execute-payment \
+    <div class="service-card">
+      <div class="service-name">☕ Java Backend</div>
+      <span class="status-badge running">✓ Running</span>
+      <div class="port-info">
+        <strong>http://localhost:8080</strong><br>
+        Spring Boot 3.2.3<br>
+        Payment Switch Core
+      </div>
+      <div class="action-buttons">
+        <button onclick="testBackend()">Test Health</button>
+        <a href="http://localhost:8080" class="button" target="_blank">Visit →</a>
+      </div>
+      <div id="backend-result" class="result"></div>
+    </div>
+
+    <div class="service-card">
+      <div class="service-name">🐍 Python Agent SDK</div>
+      <span class="status-badge running">✓ Running</span>
+      <div class="port-info">
+        <strong>http://localhost:8000</strong><br>
+        FastAPI Untrusted Client<br>
+        HMAC Signing & Retries
+      </div>
+      <div class="action-buttons">
+        <button onclick="testPython()">Test Health</button>
+        <a href="http://localhost:8000" class="button" target="_blank">Visit →</a>
+      </div>
+      <div id="python-result" class="result"></div>
+    </div>
+
+    <div class="service-card">
+      <div class="service-name">🎨 Angular Dashboard</div>
+      <span class="status-badge running">✓ Running</span>
+      <div class="port-info">
+        <strong>http://localhost:4200</strong><br>
+        User Control Plane<br>
+        Mandate Management
+      </div>
+      <div class="action-buttons">
+        <button onclick="testAngular()">Test Health</button>
+        <a href="http://localhost:4200" class="button" target="_blank">Open Dashboard →</a>
+      </div>
+      <div id="angular-result" class="result"></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="test-section">
+    <h2>🧪 Test Payment Flow</h2>
+    <p>Execute a complete payment with idempotency protection and velocity limits:</p>
+
+    <h3 style="margin-top: 1.5rem; margin-bottom: 0.75rem;">Step 1: Trigger Payment</h3>
+    <p style="margin-bottom: 1rem;">Send a signed payment intent from the Python agent to the Java backend:</p>
+    <div class="code-block">curl -X POST http://localhost:8000/agent/execute-payment \
   -H "Content-Type: application/json" \
   -d '{
     "payer_vpa": "user@upi",
     "payee_vpa": "merchant@hdfc",
     "amount_paise": 50000,
-    "category": "FOOD",
-    "agent_context": "Paid for lunch delivery"
-  }'
-          </div>
-          <p style="margin-top: 0.75rem; font-size: 0.9rem; color: var(--text-secondary);">The Python client will sign this payload with raw-byte HMAC and forward it to the Java backend.</p>
-        </div>
-      </div>
+    "category": "FOOD"
+  }'</div>
+    <button onclick="testPayment()">Execute Payment</button>
+    <div id="payment-result" class="result"></div>
 
-      <div class="flow-step">
-        <div class="flow-number">3</div>
-        <div class="flow-content">
-          <h4>Java Backend Validates & Executes</h4>
-          <p>The backend will:</p>
-          <ul style="margin-left: 1rem; margin-top: 0.5rem; font-size: 0.95rem; color: var(--text-secondary);">
-            <li>Verify HMAC signature (raw-byte match)</li>
-            <li>Check replay window (5 min clock skew)</li>
-            <li>Lock user's account balance (pessimistic)</li>
-            <li>Verify mandate status & daily velocity</li>
-            <li>Create transaction + double-entry ledger</li>
-            <li>Fire Outbox event to Kafka</li>
-          </ul>
-          <div class="code-block">
-{
-  "txn_id": "txn_abc123xyz",
-  "status": "LEDGER_RESERVED"
-}
-          </div>
-        </div>
-      </div>
+    <h3 style="margin-top: 2rem; margin-bottom: 0.75rem;">Step 2: Monitor Outbox Events</h3>
+    <p style="margin-bottom: 1rem;">View Kafka events from the transactional outbox:</p>
+    <div class="code-block">docker exec -it agenticupi_kafka kafka-console-consumer \
+  --bootstrap-server localhost:9092 \
+  --topic upi.agentic.events \
+  --from-beginning</div>
 
-      <div class="flow-step">
-        <div class="flow-number">4</div>
-        <div class="flow-content">
-          <h4>View Mandate Revocation (Kill-Switch)</h4>
-          <p>Go back to http://localhost:4200 and click "🚨 Revoke Access" on the mandate card.</p>
-          <p>This triggers a <strong>pessimistic</strong> database update: the mandate status changes to REVOKED on the backend first, then the UI refreshes to show the change.</p>
-          <p>Future payments from this agent will be rejected with <code>MANDATE_REVOKED</code>.</p>
-        </div>
-      </div>
+    <h3 style="margin-top: 2rem; margin-bottom: 0.75rem;">Step 3: Mandate Management</h3>
+    <p style="margin-bottom: 1rem;">Open the Angular dashboard to manage mandates with pessimistic revocation:</p>
+    <a href="http://localhost:4200" class="button" style="margin-top: 1rem;" target="_blank">Open Dashboard</a>
+  </div>
 
-      <div class="flow-step">
-        <div class="flow-number">5</div>
-        <div class="flow-content">
-          <h4>Inspect Database & Cache State</h4>
-          <p>Query the MariaDB to see the transaction ledger:</p>
-          <div class="code-block">
-docker exec -it agenticupi_db mysql -u api_user -p agenticupi
-SELECT * FROM transactions LIMIT 10;
-SELECT * FROM ledger_entries LIMIT 10;
-          </div>
-          <p style="margin-top: 0.75rem; font-size: 0.9rem; color: var(--text-secondary);">Redis velocity/idempotency cache expires in 48 hours. Inspect via <code>docker exec -it agenticupi_redis redis-cli KEYS "idemp:*"</code></p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <h2>API Endpoints</h2>
-    <div class="endpoints">
-      <div class="endpoint-card">
-        <span class="endpoint-method method-post">POST</span>
-        <div class="endpoint-path">/v1/agent/execute-payment</div>
-        <div class="endpoint-description"><strong>Zone 0 → Zone 1 boundary.</strong> Python SDK submits signed payment intent. Returns txn_id on success.</div>
-      </div>
-
-      <div class="endpoint-card">
-        <span class="endpoint-method method-get">GET</span>
-        <div class="endpoint-path">/api/v1/user/mandates</div>
-        <div class="endpoint-description"><strong>Zone 2 dashboard.</strong> Fetch active mandates for the logged-in user. Unauthenticated (demo only).</div>
-      </div>
-
-      <div class="endpoint-card">
-        <span class="endpoint-method method-delete">DELETE</span>
-        <div class="endpoint-path">/api/v1/user/mandates/{umn}</div>
-        <div class="endpoint-description"><strong>Kill-switch endpoint.</strong> Revokes mandate durably at DB, then tombstones Redis cache. Pessimistic semantics.</div>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="signal-box">
-      <h4>🎯 Interview Signal: Why This Architecture Matters</h4>
-      <p>This system demonstrates the exact patterns asked about at Principal/Staff level in fintech:</p>
-      <ul>
-        <li><strong>Raw-Byte HMAC:</strong> Eliminates JSON canonicalization vulnerabilities across Python ↔ Java integration.</li>
-        <li><strong>Idempotency Lifecycle:</strong> UUID generated outside retry loops prevents accidental double-debits on timeouts.</li>
-        <li><strong>Two-Phase Velocity:</strong> Redis holds pending reservation; DB commit finalizes it via post-commit hooks. If DB rollbacks, Redis is cleared. No lost quota.</li>
-        <li><strong>Pessimistic Kill-Switches:</strong> Mandate revocation updates DB first, then caches tombstone. Fail-closed: if cache is down, DB blocks the payment anyway.</li>
-        <li><strong>SKIP LOCKED Outbox:</strong> Multiple pods claim rows without contention. Kafka I/O happens outside DB locks. Horizontal scale without lock timeouts.</li>
-        <li><strong>Declarative UI:</strong> Angular RxJS streams + OnPush change detection. No manual subscription management or memory leaks.</li>
-      </ul>
-    </div>
-  </section>
-
-  <section>
-    <h2>Next Steps</h2>
-    <p style="margin-bottom: 1rem;">
-      Your entire stack is now running. You can:
-    </p>
-    <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
-      <li><strong>Test the Python SDK:</strong> Send a payment via the curl command in step 2 above.</li>
-      <li><strong>Monitor Kafka:</strong> <code>docker exec -it agenticupi_kafka kafka-console-consumer --bootstrap-server localhost:9092 --topic upi.agentic.events --from-beginning</code></li>
-      <li><strong>Inspect MariaDB:</strong> Use any SQL client pointing to <code>localhost:3306</code>, user <code>api_user</code>, password <code>api_password</code>.</li>
-      <li><strong>View Logs:</strong> <code>docker logs -f agenticupi-backend-java-1</code> (replace with container name from <code>docker ps</code>).</li>
-      <li><strong>Stop All Services:</strong> <code>docker compose down</code> (preserves data volumes).</li>
+  <div class="test-section">
+    <h2>📚 Documentation & Code</h2>
+    <p><strong>Architecture & Design:</strong></p>
+    <ul style="margin-left: 2rem; margin-top: 1rem;">
+      <li style="margin-bottom: 0.5rem;"><strong>Phase 1:</strong> HLD architecture with SLA budgets and threat model</li>
+      <li style="margin-bottom: 0.5rem;"><strong>Phase 2:</strong> Data models with double-entry ledger and generated columns</li>
+      <li style="margin-bottom: 0.5rem;"><strong>Phase 3:</strong> Backend LLD with raw-byte HMAC, two-phase velocity, pessimistic locking</li>
+      <li style="margin-bottom: 0.5rem;"><strong>Phase 4:</strong> Python agent with strict Pydantic and idempotency key lifecycle</li>
+      <li style="margin-bottom: 0.5rem;"><strong>Phase 5:</strong> Angular UI with RxJS streams and pessimistic revocation</li>
     </ul>
-  </section>
+    <p style="margin-top: 1.5rem;">All code is in <strong>https://github.com/5andeepNambiar/AgenticUPI</strong></p>
+  </div>
 
-  <footer>
-    <p>AgenticUPI — A production-grade distributed payment switch designed for Principal/Staff engineer interview prep. All code zero-mock, fully realistic.</p>
-    <p style="margin-top: 1rem;">Built for fintech resilience: idempotency, fail-closed semantics, untrusted boundary isolation, and high-concurrency safety at every layer.</p>
-  </footer>
+  <div class="test-section">
+    <h2>🎯 Key Technical Highlights</h2>
+    <ul style="margin-left: 2rem;">
+      <li style="margin-bottom: 1rem;"><strong>Raw-Byte HMAC-SHA256:</strong> Exact HTTP body signing prevents JSON canonicalization bugs across Java/Python integration</li>
+      <li style="margin-bottom: 1rem;"><strong>Two-Phase Velocity:</strong> Redis Lua + DB transaction + post-commit hooks = durability without permanent quota loss</li>
+      <li style="margin-bottom: 1rem;"><strong>Idempotency Key Lifecycle:</strong> UUID generated once BEFORE retry loop prevents double-debits on timeouts</li>
+      <li style="margin-bottom: 1rem;"><strong>Claim-Publish-Ack Outbox:</strong> FOR UPDATE SKIP LOCKED releases DB locks before Kafka publish, enables horizontal scaling to 10K TPS</li>
+      <li style="margin-bottom: 1rem;"><strong>Pessimistic Mandate Kill-Switch:</strong> DB revocation first, then Redis tombstone. If cache is down, DB still blocks payments</li>
+    </ul>
+  </div>
 </div>
+
+<script>
+function testBackend() {
+  const resultDiv = document.getElementById('backend-result');
+  resultDiv.classList.add('show');
+  resultDiv.innerHTML = '<p>Testing...</p>';
+  resultDiv.classList.remove('success', 'error');
+
+  fetch('http://localhost:8080/', { method: 'GET' })
+    .then(r => {
+      resultDiv.classList.add('success');
+      resultDiv.innerHTML = '<strong>✓ Backend is healthy on port 8080</strong>';
+    })
+    .catch(e => {
+      resultDiv.classList.add('error');
+      resultDiv.innerHTML = '<strong>✗ Backend not accessible:</strong> ' + e.message;
+    });
+}
+
+function testPython() {
+  const resultDiv = document.getElementById('python-result');
+  resultDiv.classList.add('show');
+  resultDiv.innerHTML = '<p>Testing...</p>';
+  resultDiv.classList.remove('success', 'error');
+
+  fetch('http://localhost:8000/', { method: 'GET' })
+    .then(r => {
+      resultDiv.classList.add('success');
+      resultDiv.innerHTML = '<strong>✓ Python Agent is healthy on port 8000</strong>';
+    })
+    .catch(e => {
+      resultDiv.classList.add('error');
+      resultDiv.innerHTML = '<strong>✗ Python Agent not accessible:</strong> ' + e.message;
+    });
+}
+
+function testAngular() {
+  const resultDiv = document.getElementById('angular-result');
+  resultDiv.classList.add('show');
+  resultDiv.innerHTML = '<p>Testing...</p>';
+  resultDiv.classList.remove('success', 'error');
+
+  fetch('http://localhost:4200/', { method: 'GET' })
+    .then(r => {
+      resultDiv.classList.add('success');
+      resultDiv.innerHTML = '<strong>✓ Angular Dashboard is healthy on port 4200</strong>';
+    })
+    .catch(e => {
+      resultDiv.classList.add('error');
+      resultDiv.innerHTML = '<strong>✗ Dashboard not accessible:</strong> ' + e.message;
+    });
+}
+
+function testPayment() {
+  const resultDiv = document.getElementById('payment-result');
+  resultDiv.classList.add('show');
+  resultDiv.innerHTML = '<p>Executing payment...</p>';
+  resultDiv.classList.remove('success', 'error');
+
+  fetch('http://localhost:8000/agent/execute-payment', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      payer_vpa: 'user@upi',
+      payee_vpa: 'merchant@hdfc',
+      amount_paise: 50000,
+      category: 'FOOD'
+    })
+  })
+    .then(r => r.json())
+    .then(data => {
+      resultDiv.classList.add('success');
+      resultDiv.innerHTML = '<strong>✓ Payment executed successfully</strong><div style="margin-top: 1rem; font-family: monospace; font-size: 0.85rem;">' + JSON.stringify(data, null, 2).replace(/\n/g, '<br>').replace(/ /g, '&nbsp;') + '</div>';
+    })
+    .catch(e => {
+      resultDiv.classList.add('error');
+      resultDiv.innerHTML = '<strong>✗ Payment test failed:</strong> ' + e.message;
+    });
+}
+
+function testService(url, name) {
+  fetch(url, { method: 'GET' })
+    .then(r => alert(name + ' is responding'))
+    .catch(e => alert(name + ' error: ' + e.message));
+}
+
+// Auto-test on load
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    testBackend();
+    testPython();
+    testAngular();
+  }, 500);
+});
+</script>

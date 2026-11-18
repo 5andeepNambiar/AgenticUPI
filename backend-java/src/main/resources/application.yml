@@ -3,10 +3,10 @@ spring:
     name: agenticupi-backend
 
   datasource:
-    url: jdbc:mariadb://agenticupi_db:3306/agenticupi?rewriteBatchedStatements=true
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/agenticupi?reWriteBatchedInserts=true
     username: api_user
     password: api_password
-    driver-class-name: org.mariadb.jdbc.Driver
+    driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 50
       minimum-idle: 10
@@ -16,7 +16,7 @@ spring:
     hibernate:
       ddl-auto: validate # We manage schema strictly via our init.sql / flyway
     show-sql: false
-    database-platform: org.hibernate.dialect.MariaDBDialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 
   data:
     redis:
@@ -34,6 +34,12 @@ spring:
     consumer:
       group-id: agenticupi-group
       auto-offset-reset: earliest
+
+grpc:
+  client:
+    agent-validation-service:
+      address: 'static://${GRPC_AGENT_HOST:localhost}:50051'
+      negotiationType: PLAINTEXT
 
 server:
   port: 8080

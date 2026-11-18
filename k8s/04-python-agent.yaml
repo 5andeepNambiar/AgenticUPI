@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: agent-svc
+  namespace: agenticupi
+spec:
+  selector:
+    app: python-agent
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+    - name: grpc
+      port: 50051
+      targetPort: 50051
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agent-deployment
+  namespace: agenticupi
+  labels:
+    app: python-agent
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: python-agent
+  template:
+    metadata:
+      labels:
+        app: python-agent
+    spec:
+      containers:
+        - name: python-agent
+          image: 5andeepnambiar/agenticupi-python-agent:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: AGENTIC_UPI_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: agenticupi-config
+                  key: AGENTIC_UPI_BASE_URL
+            - name: AGENTIC_UPI_AGENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: agenticupi-config
+                  key: AGENTIC_UPI_AGENT_ID
+            - name: AGENTIC_UPI_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: agenticupi-secrets
+                  key: AGENTIC_UPI_SECRET
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5

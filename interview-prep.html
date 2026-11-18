@@ -1,0 +1,425 @@
+<title>AgenticUPI: Interview Prep Guide</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #1a1a1a;
+  --accent: #0066cc;
+  --accent-light: #e6f0ff;
+  --border: #e0e0e0;
+  --success: #10b981;
+  --warning: #f59e0b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1a1a1a;
+    --fg: #ffffff;
+    --accent: #5599ff;
+    --accent-light: #1a3a66;
+    --border: #444444;
+    --success: #34d399;
+    --warning: #fbbf24;
+  }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--fg); line-height: 1.6; }
+.container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+
+header { margin-bottom: 3rem; }
+h1 { font-size: 2.5rem; margin-bottom: 0.5rem; font-weight: 700; }
+.tagline { font-size: 1.1rem; color: #888; margin-bottom: 1.5rem; }
+
+nav { display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
+nav button { padding: 0.75rem 1.5rem; border: 2px solid var(--accent); background: transparent; color: var(--accent); border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s ease; }
+nav button.active { background: var(--accent); color: white; }
+nav button:hover { opacity: 0.8; }
+
+.section { display: none; }
+.section.active { display: block; animation: fadeIn 0.3s ease; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+h2 { font-size: 1.8rem; margin-bottom: 1.5rem; border-bottom: 3px solid var(--accent); padding-bottom: 0.5rem; }
+h3 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: 0.75rem; font-weight: 600; color: var(--accent); }
+
+.box { border-left: 4px solid var(--accent); background: var(--accent-light); padding: 1.5rem; margin: 1.5rem 0; border-radius: 6px; }
+.box p { margin-bottom: 0.75rem; }
+.box p:last-child { margin-bottom: 0; }
+
+.highlight { background: var(--accent); color: white; padding: 0.2rem 0.4rem; border-radius: 3px; }
+.code { font-family: monospace; background: #f5f5f5; padding: 0.2rem 0.4rem; border-radius: 3px; }
+
+@media (prefers-color-scheme: dark) {
+  .code { background: #2a2a2a; }
+}
+
+ul, ol { margin-left: 2rem; }
+li { margin-bottom: 0.75rem; }
+
+.talking-point { background: var(--accent-light); border: 2px solid var(--accent); padding: 1.5rem; margin: 1.5rem 0; border-radius: 8px; }
+.talking-point-title { font-weight: 600; color: var(--accent); margin-bottom: 0.5rem; font-size: 1.1rem; }
+.talking-point-text { margin-bottom: 0.75rem; }
+.talking-point-text:last-child { margin-bottom: 0; }
+
+.challenge { background: var(--warning); background-opacity: 0.1; border: 2px solid var(--warning); padding: 1.5rem; margin: 1.5rem 0; border-radius: 8px; }
+.challenge-q { font-weight: 600; color: var(--warning); margin-bottom: 1rem; }
+.challenge-a { font-style: italic; color: #888; line-height: 1.7; }
+
+.timeline { margin: 2rem 0; }
+.timeline-item { padding: 1.5rem; margin-bottom: 1rem; border-left: 4px solid var(--accent); background: var(--accent-light); border-radius: 6px; }
+.timeline-item-time { font-weight: 600; color: var(--accent); margin-bottom: 0.5rem; }
+.timeline-item-text { color: var(--fg); }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 1.5rem 0; }
+.grid-item { background: var(--accent-light); border: 2px solid var(--border); padding: 1.5rem; border-radius: 8px; }
+.grid-item-title { font-weight: 600; color: var(--accent); margin-bottom: 0.75rem; }
+
+.quote { border-left: 4px solid var(--accent); padding-left: 1.5rem; font-style: italic; margin: 1.5rem 0; font-size: 1.05rem; }
+
+footer { margin-top: 3rem; padding-top: 2rem; border-top: 2px solid var(--border); text-align: center; color: #888; }
+
+.tabs-content { margin-top: 1.5rem; }
+</style>
+
+<div class="container">
+  <header>
+    <h1>🚀 AgenticUPI Interview Prep</h1>
+    <p class="tagline">Principal/Staff-level system design for untrusted LLM payment agents</p>
+  </header>
+
+  <nav>
+    <button class="nav-btn active" onclick="showSection('overview')">Overview</button>
+    <button class="nav-btn" onclick="showSection('opening')">Opening Statement</button>
+    <button class="nav-btn" onclick="showSection('deep-dive')">Technical Deep Dive</button>
+    <button class="nav-btn" onclick="showSection('decisions')">Key Decisions</button>
+    <button class="nav-btn" onclick="showSection('challenges')">Interview Challenges</button>
+    <button class="nav-btn" onclick="showSection('resources')">Resources & Links</button>
+  </nav>
+
+  <!-- OVERVIEW -->
+  <div id="overview" class="section active">
+    <h2>System Overview</h2>
+
+    <h3>What is AgenticUPI?</h3>
+    <p>A production-grade distributed payment switch that safely executes UPI payments on behalf of untrusted LLM agents (ChatGPT, Claude, custom models) at 10K TPS with zero data loss.</p>
+
+    <div class="box">
+      <p><strong>Interview Signal:</strong> This system demonstrates Principal/Staff expertise in financial systems, distributed architectures, and untrusted boundary design — exactly what Navi/PhonePe need.</p>
+    </div>
+
+    <h3>The Core Problem</h3>
+    <p>How do you allow autonomous AI agents to execute payments while maintaining:</p>
+    <ul>
+      <li><strong>Zero double-debits</strong> — Even on network timeouts and retries</li>
+      <li><strong>Real-time mandate kill-switches</strong> — Users revoke agent access instantly</li>
+      <li><strong>Untrusted input validation</strong> — Cryptographic verification, not trust</li>
+      <li><strong>High throughput</strong> — 10K TPS without lock contention</li>
+    </ul>
+
+    <h3>Three Trust Zones</h3>
+    <div class="grid">
+      <div class="grid-item">
+        <div class="grid-item-title">🤖 Zone 0: Untrusted</div>
+        <p>Python FastAPI agent SDK. LLM generates payment intents, signs with raw-byte HMAC-SHA256. We assume this is compromised.</p>
+      </div>
+      <div class="grid-item">
+        <div class="grid-item-title">💳 Zone 1: Core Authority</div>
+        <p>Java Spring Boot payment switch. MariaDB is the absolute truth. Redis accelerates, but doesn't decide. All financial decisions live here.</p>
+      </div>
+      <div class="grid-item">
+        <div class="grid-item-title">📊 Zone 2: Control Plane</div>
+        <p>Angular RxJS dashboard. Users manage and revoke mandates. Pessimistic UI (no optimistic updates for kill-switches).</p>
+      </div>
+    </div>
+
+    <h3>Resume Bullet</h3>
+    <div class="box">
+      <p><strong>Designed and implemented a distributed payment switch (AgenticUPI) to safely execute payments on behalf of untrusted LLM agents at 10K TPS with zero data loss.</strong> Engineered 2-phase Redis Lua velocity reservations synchronized durably with MariaDB via Spring post-commit hooks to prevent permanent quota loss on DB rollbacks. Implemented raw-byte HMAC-SHA256 verification eliminating JSON canonicalization vulnerabilities across Python-Java integration. Built high-throughput Kafka outbox relays using FOR UPDATE SKIP LOCKED and Claim-Publish-Ack patterns to scale horizontally without lock contention. Demonstrated fail-closed security with pessimistic mandate kill-switches, timestamp replay windows, and idempotency key lifecycle management.</p>
+    </div>
+  </div>
+
+  <!-- OPENING STATEMENT -->
+  <div id="opening" class="section">
+    <h2>Your Opening Statement (2 minutes)</h2>
+
+    <div class="quote">
+      "AgenticUPI is a distributed payment switch I built to solve a specific problem: how do you let untrusted LLM agents execute financial transactions without risking double-debits, lost quota, or race conditions? The system achieves 10K TPS with zero data loss, implements cryptographic boundary validation, and demonstrates a clear separation between the untrusted Zone 0 (the agent), the authoritative Zone 1 (the backend), and the control Zone 2 (the user dashboard)."
+    </div>
+
+    <p>This opening does three things:</p>
+    <ol>
+      <li><strong>Names the problem explicitly</strong> — Shows you understand the domain</li>
+      <li><strong>States the constraints</strong> — 10K TPS, zero data loss, cryptographic validation</li>
+      <li><strong>Identifies the architecture</strong> — Three zones with clear trust boundaries</li>
+    </ol>
+
+    <h3>What Happens Next</h3>
+    <p>After your opening, expect one of these directions:</p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-item-time">"Walk me through the three zones"</div>
+        <div class="timeline-item-text">They want technical depth. Jump to "Technical Deep Dive" section below.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-item-time">"How did you solve double-debits?"</div>
+        <div class="timeline-item-text">They're testing your understanding of idempotency. Answer: "Idempotency key is generated ONCE before the retry loop. On timeout, the retry uses the same key. The backend checks Redis (fast path), then the database (UNIQUE constraint). If the key exists with matching request hash, we return the cached result. If the hash differs, we reject as a conflict."</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-item-time">"What would you do differently?"</div>
+        <div class="timeline-item-text">A good sign. Shows confidence and invites discussion. Answer honestly — maybe you'd add envelope encryption for HMAC secrets, or use optimistic locking instead of pessimistic in places.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TECHNICAL DEEP DIVE -->
+  <div id="deep-dive" class="section">
+    <h2>Technical Deep Dive (5-10 minutes)</h2>
+
+    <p>Walk through each zone systematically.</p>
+
+    <h3>Zone 0: Untrusted Agent (Python FastAPI)</h3>
+    <div class="talking-point">
+      <div class="talking-point-title">The Problem</div>
+      <div class="talking-point-text">An LLM agent generates a payment intent. I can't trust its input. The agent could be compromised, hallucinating, or malicious.</div>
+    </div>
+
+    <div class="talking-point">
+      <div class="talking-point-title">The Solution</div>
+      <div class="talking-point-text"><strong>Raw-byte HMAC-SHA256 signing.</strong> The agent signs the exact HTTP request bytes, not a reconstructed JSON string. Why? Because Java's Jackson and Python's json.dumps serialize differently (key order, float precision, whitespace). If we signed the canonical JSON, a multi-language system would never match signatures.</div>
+    </div>
+
+    <div class="talking-point">
+      <div class="talking-point-title">Implementation</div>
+      <div class="talking-point-text">
+        <code>body_hash = SHA256(raw_body_bytes)</code><br>
+        <code>signature_base = body_hash + "." + timestamp + "." + idempotency_key + "." + agent_id</code><br>
+        <code>signature = HMAC-SHA256(shared_secret, signature_base)</code><br>
+        The backend verifies this signature BEFORE deserializing any JSON.
+      </div>
+    </div>
+
+    <div class="talking-point">
+      <div class="talking-point-title">Idempotency Key Lifecycle (Critical!)</div>
+      <div class="talking-point-text">Generate the UUID ONCE, BEFORE the tenacity retry wrapper. Pass the same key to all retries. This prevents double-debits on timeouts. If you generate UUID inside the retry loop, each timeout creates a new key, and the backend treats it as a new payment.</div>
+    </div>
+
+    <h3>Zone 1: Core Authority (Java Spring Boot)</h3>
+    <div class="talking-point">
+      <div class="talking-point-title">The Problem</div>
+      <div class="talking-point-text">The backend receives a signed request. It must verify the signature, check velocity limits, and commit money without ever double-charging, even on retries. Database must be the source of truth. Redis accelerates but doesn't decide.</div>
+    </div>
+
+    <div class="talking-point">
+      <div class="talking-point-title">Two-Phase Velocity Reservations</div>
+      <div class="talking-point-text">
+        <strong>Phase 1 (Redis Lua):</strong> Create a PENDING reservation with timestamp-based scoring. This is fast, non-blocking.<br>
+        <strong>Phase 2 (DB Transaction):</strong> Execute the payment in MariaDB with pessimistic locks. If the DB commits, the Redis reservation is durable — the agent has used their quota.<br>
+        <strong>Phase 3 (POST-COMMIT Hook):</strong> Spring TransactionSynchronizationManager finalizes the Redis reservation. If the DB rolls back, the hook clears the reservation — the user doesn't permanently lose quota.
+      </div>
+    </div>
+
+    <div class="talking-point">
+      <div class="talking-point-title">Why This Matters</div>
+      <div class="talking-point-text">If you only use Redis for velocity, a DB rollback leaves a stale reservation consuming quota forever. If you only use the DB, you're blocked on DB latency (slow). This two-phase design gives you speed + durability.</div>
+    </div>
+
+    <div class="talking-point">
+      <div class="talking-point-title">Idempotency Verification</div>
+      <div class="talking-point-text">Calculate <code>request_hash = SHA256(raw_body_bytes)</code>. Store <code>"hash:IDEMPOTENCY_KEY:STATUS:PAYLOAD"</code> in Redis with 48-hour TTL. On collision, compare hashes. If they match, return cached result. If they differ, reject with IDEMPOTENCY_CONFLICT error.</div>
+    </div>
+
+    <div class="talking-point">
+      <div class="talking-point-title">Double-Entry Ledger</div>
+      <div class="talking-point-text">Every payment creates two ledger entries: DEBIT from payer, CREDIT to payee. This ensures balanced books and enables reconciliation. Prevents silent corruption.</div>
+    </div>
+
+    <h3>Zone 2: Control Plane (Angular RxJS)</h3>
+    <div class="talking-point">
+      <div class="talking-point-title">Pessimistic Mandate Revocation</div>
+      <div class="talking-point-text">User clicks "Revoke Agent Access". The UI does NOT immediately show "Revoked". Instead: (1) Backend updates the DB, (2) Sets a Redis tombstone, (3) UI polls and refreshes. Only after the backend confirms does the UI update. This prevents lying to users about kill-switches.</div>
+    </div>
+
+    <div class="talking-point">
+      <div class="talking-point-title">RxJS Streams</div>
+      <div class="talking-point-text">Mandate service exposes <code>mandates$: Observable&lt;Mandate[]&gt;</code> using BehaviorSubject trigger. Component subscribes with async pipe, automatic unsubscribe on destroy. No manual subscriptions, no memory leaks.</div>
+    </div>
+
+    <div class="talking-point">
+      <div class="talking-point-title">OnPush Change Detection</div>
+      <div class="talking-point-text">Every component uses <code>ChangeDetectionStrategy.OnPush</code>. Change detection runs only when @Input changes or an observable emits. This scales to hundreds of components without performance degradation.</div>
+    </div>
+  </div>
+
+  <!-- KEY DECISIONS -->
+  <div id="decisions" class="section">
+    <h2>Key Technical Decisions</h2>
+
+    <h3>1. Raw-Byte HMAC (Not JSON Canonicalization)</h3>
+    <div class="talking-point">
+      <div class="talking-point-title">Why This Signals Expertise</div>
+      <div class="talking-point-text">Most engineers assume JSON canonicalization is the solution. But at scale, different languages serialize differently. This shows you've debugged multi-language integration failures and learned the hard way.</div>
+    </div>
+
+    <h3>2. Two-Phase Velocity (Not Just Redis, Not Just DB)</h3>
+    <div class="talking-point">
+      <div class="talking-point-title">Why This Signals Expertise</div>
+      <div class="talking-point-text">Cache-aside is easy. Cache-first is risky. This pattern combines speed + durability without sacrificing either. Shows deep understanding of distributed systems trade-offs.</div>
+    </div>
+
+    <h3>3. Claim-Publish-Ack Outbox (Not One-Shot Publish)</h3>
+    <div class="talking-point">
+      <div class="talking-point-title">Why This Signals Expertise</div>
+      <div class="talking-point-text">Three-step pattern: (1) Claim rows from outbox with FOR UPDATE SKIP LOCKED, release lock, (2) Publish to Kafka outside the transaction, (3) Ack success in a separate transaction. Enables horizontal scaling without lock contention. Most engineers try to publish inside the transaction and hit timeouts.</div>
+    </div>
+
+    <h3>4. Pessimistic Mandate Revocation (Not Optimistic UI)</h3>
+    <div class="talking-point">
+      <div class="talking-point-title">Why This Signals Expertise</div>
+      <div class="talking-point-text">For kill-switches, never lie to users. Pessimistic revocation means: update DB first, then UI reflects reality. Shows you prioritize safety over perceived responsiveness.</div>
+    </div>
+
+    <h3>5. Fail-Closed Architecture</h3>
+    <div class="talking-point">
+      <div class="talking-point-title">Why This Signals Expertise</div>
+      <div class="talking-point-text">If Redis is down, payments still work (hitting DB directly). If Kafka is down, outbox events queue in DB until Kafka recovers. If any cache is stale, the DB is the source of truth. This is financial systems thinking.</div>
+    </div>
+  </div>
+
+  <!-- INTERVIEW CHALLENGES -->
+  <div id="challenges" class="section">
+    <h2>Common Interview Challenges & Answers</h2>
+
+    <div class="challenge">
+      <div class="challenge-q">❓ "An agent's payment request times out on the wire. How do we know we haven't double-charged?"</div>
+      <div class="challenge-a">
+        The idempotency key is generated once, before the retry loop. If the request times out, the retry uses the exact same key. The backend's idempotency logic first checks Redis (fast path) — if the key exists with a matching request hash, we return the cached result. If the hash differs, we reject as a conflict. This is why the idempotency key must be stable across retries. The database has a UNIQUE constraint on (idempotency_key, agent_id), so even if Redis is down, the DB prevents double-debits.
+      </div>
+    </div>
+
+    <div class="challenge">
+      <div class="challenge-q">❓ "What happens if the backend crashes after reserving velocity but before committing the payment?"</div>
+      <div class="challenge-a">
+        The velocity reservation is PENDING in Redis. The DB transaction never committed, so there's no ledger entry. On backend restart, we don't finalize the reservation. The Redis entry expires after 24 hours. The user doesn't permanently lose quota. This is why the two-phase design matters — if we only used Redis, the reservation would stick forever.
+      </div>
+    </div>
+
+    <div class="challenge">
+      <div class="challenge-q">❓ "What if a user revokes an agent's mandate but a payment is in-flight?"</div>
+      <div class="challenge-a">
+        Mandate revocation updates the DB immediately, setting status=REVOKED. If a payment is in-flight, it will check the mandate status before creating the ledger entry. If the mandate is revoked, the payment is rejected. The mandate tombstone in Redis ensures the check is fast. If the agent tries to retry the payment, it gets rejected again.
+      </div>
+    </div>
+
+    <div class="challenge">
+      <div class="challenge-q">❓ "How do you prevent an agent from retrying forever to exploit a race condition?"</div>
+      <div class="challenge-a">
+        The idempotency key has a 48-hour TTL. After 48 hours, if the agent retries with the same key, it's treated as a new transaction (quota check, mandate check, etc. run again). This bounds the retry window while giving the agent enough time to recover from transient failures. We also track failed attempts and can throttle or block an agent after repeated failures.
+      </div>
+    </div>
+
+    <div class="challenge">
+      <div class="challenge-q">❓ "Why not use optimistic locking instead of pessimistic?"</div>
+      <div class="challenge-a">
+        Optimistic locking (versioning + retry on conflict) works well for read-heavy, low-contention systems. But payment velocity is high-contention — many agents trying to hit the same quota simultaneously. Pessimistic locking (SELECT ... FOR UPDATE) wins here. We do use optimistic conflict detection as a fallback — if the version check fails, we know the DB changed and can retry or reject gracefully.
+      </div>
+    </div>
+
+    <div class="challenge">
+      <div class="challenge-q">❓ "What's the latency profile? Can we hit 10K TPS?"</div>
+      <div class="challenge-a">
+        Redis velocity check: ~1ms. DB pessimistic lock + insert ledger entries + commit: ~5-10ms. Kafka publish (async, outside transaction): ~2-5ms. Total: ~10-15ms p95. At 10K TPS, we're processing ~100-150 requests per millisecond per pod. With connection pooling (50 max connections) and multiple pods, we scale horizontally. Lock timeouts are rare because we hold locks briefly and use SKIP LOCKED for batch claims.
+      </div>
+    </div>
+
+    <div class="challenge">
+      <div class="challenge-q">❓ "How do you handle KMS decryption for HMAC secrets? Isn't that a bottleneck?"</div>
+      <div class="challenge-a">
+        We cache decrypted secrets in memory with a 1-hour TTL and automatic refresh on expiry. KMS decryption happens once per hour per credential, not per request. This gives us the security of envelope encryption without the latency penalty.
+      </div>
+    </div>
+
+    <div class="challenge">
+      <div class="challenge-q">❓ "What would you do differently if you built this again?"</div>
+      <div class="challenge-a">
+        [This is a good opportunity to show humility and deeper thinking. Examples:]<br>
+        • I might use optimistic locking on mandates (lower contention) instead of pessimistic, with conflict resolution.<br>
+        • I'd add circuit breakers for Redis/Kafka failures earlier — current design works but could fail-over faster.<br>
+        • I'd instrument velocity differently — current bucketing (time-based) works, but I'd explore token-bucket algorithms for smoother rate limiting.<br>
+        • I'd build an audit log from the start, not retrofit it later.
+      </div>
+    </div>
+  </div>
+
+  <!-- RESOURCES -->
+  <div id="resources" class="section">
+    <h2>Resources & Links</h2>
+
+    <h3>GitHub Repository</h3>
+    <div class="box">
+      <p><strong>https://github.com/5andeepNambiar/AgenticUPI</strong></p>
+      <p>All production code. Zero mocks. Ready to review.</p>
+    </div>
+
+    <h3>Design Documentation</h3>
+    <ul>
+      <li><strong>Phase 1: HLD Architecture</strong> — SLA budgets, STRIDE threat model, resume signals</li>
+      <li><strong>Phase 2: Data Models</strong> — ER schema, generated columns, KMS encryption</li>
+      <li><strong>Phase 3: Backend LLD</strong> — Raw HMAC, two-phase velocity, pessimistic locking, outbox relays</li>
+      <li><strong>Phase 4: Agent Service</strong> — Pydantic strict validation, idempotency lifecycle, httpx singleton</li>
+      <li><strong>Phase 5: Angular UI</strong> — RxJS streams, OnPush change detection, pessimistic revocation</li>
+    </ul>
+
+    <h3>Code Highlights to Show</h3>
+    <ul>
+      <li><span class="code">backend-java/.../HmacAuthenticationFilter.java</span> — Raw-payload HMAC validation with constant-time comparison</li>
+      <li><span class="code">backend-java/.../PaymentSwitchService.java</span> — Core ACID boundary with two-phase velocity and post-commit hooks</li>
+      <li><span class="code">agent-python/.../client.py</span> — Idempotency key lifecycle and HMAC signing</li>
+      <li><span class="code">frontend-angular/.../mandate.service.ts</span> — RxJS declarative streams with proper lifecycle</li>
+    </ul>
+
+    <h3>Interview Narrative Arc</h3>
+    <ol>
+      <li><strong>Opening (2 min):</strong> State the problem, name the constraints, describe the architecture</li>
+      <li><strong>Zone 0 (2 min):</strong> Why raw-byte HMAC, idempotency key lifecycle</li>
+      <li><strong>Zone 1 (4 min):</strong> Two-phase velocity, double-entry ledger, Claim-Publish-Ack, fail-closed design</li>
+      <li><strong>Zone 2 (2 min):</strong> Pessimistic revocation, RxJS streams, OnPush change detection</li>
+      <li><strong>Technical Challenges (3 min):</strong> Answer 1-2 deep questions to show mastery</li>
+      <li><strong>Questions for Them (1 min):</strong> "What would you do differently? How does this compare to your payment system?"</li>
+    </ol>
+
+    <h3>Why This System Signals Principal/Staff</h3>
+    <ul>
+      <li><strong>End-to-End Ownership:</strong> Java backend, Python SDK, Angular UI, infrastructure, schema — you own the stack</li>
+      <li><strong>Security-First Design:</strong> Fail-closed semantics, cryptographic validation, pessimistic kill-switches</li>
+      <li><strong>Distributed Systems Mastery:</strong> Two-phase patterns, outbox relays, cache coordination, idempotency</li>
+      <li><strong>Production Readiness:</strong> Connection pooling, error handling, observability, schema migrations</li>
+      <li><strong>Financial Systems Understanding:</strong> Double-entry ledger, ACID guarantees, audit trails, reconciliation</li>
+    </ul>
+  </div>
+
+  <footer>
+    <p>AgenticUPI Interview Prep Guide • Last Updated Sept 2026</p>
+    <p>GitHub: <a href="https://github.com/5andeepNambiar/AgenticUPI" target="_blank" style="color: var(--accent);">5andeepNambiar/AgenticUPI</a></p>
+  </footer>
+</div>
+
+<script>
+function showSection(sectionId) {
+  // Hide all sections
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+
+  // Remove active from all nav buttons
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+  // Show selected section
+  document.getElementById(sectionId).classList.add('active');
+
+  // Mark button as active
+  event.target.classList.add('active');
+
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+</script>
